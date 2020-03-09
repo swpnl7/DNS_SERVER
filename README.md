@@ -18,4 +18,4 @@ You may face following Errors:-
 
 Cause:-  The Python json module is strict in its interpretation of JSON. The usual problem is that wherever you are getting your alleged JSON from, is not generating strictly valid JSON. A common mistake is {...}{...} or {...},{...} rather than the valid list-of-dicts [{...},{...}]
 
-Solution :- Check if the zone file is in correct json format.
+Solution :- Check if the zone file is in correct json format. To check the same you can use any online json validator.

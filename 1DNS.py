@@ -110,6 +110,49 @@ def  getrecs(data):
         zone = getzone(domain)
         return  (zone[QT], QT, domain)
 
+#Function to build question
+def  buildquestion(domainname, rectype):
+        qbytes = b''
+
+        for part in domainname:
+                length = len(part)
+                qbytes += bytes([length])
+
+                for char in part:
+                        qbytes += ord(char).to_bytes(1, byteorder='big')
+
+                #Bytes required for A record
+                if rectype == 'a':
+                        qbytes +=  (1).to_bytes(2, byteorder='big')
+
+                #Bytes required for Class record
+                qbytes += (1).to_bytes(2, byteorder='big')
+
+        return qbytes
+
+#Function to convert records to bytes
+def  rectobytes(domainname, rectype, recttl, recval):
+
+        rbytes = b'\xc0\x0c'
+
+        if rectype == 'a':
+                rbytes += rbytes + bytes([0]) + bytes([1])
+
+        #For class
+        rbytes += rbytes + bytes([0]) + bytes([1])
+
+        #For TTL
+        rbytes += int(recttl).to_bytes(4, byteorder='big')
+
+        #Record length as A record in an IPv4 address and it is 4 bytes but the length of data itelf is 2 bytes
+        if rectype == 'a':
+                rbytes += rbytes + bytes([0]) + bytes([4])
+
+        for part in recval.split('.'):
+                rbytes += bytes([int(part)])
+
+        return rbytes
+
 #Fucntion to build response
 def  buildresponse(data):
 
@@ -139,8 +182,22 @@ def  buildresponse(data):
         #Additional Count
         ADCOUNT = (0).to_bytes(2, byteorder='big')
 
+        #DNS Header
         dnsheader =  TransactionID + Flags + QDCOUNT + ANCOUNT + NSCOUNT + ADCOUNT
-        print (dnsheader)
+
+        #Create DNS body
+        dnsbody = b''
+
+        #Get answer  from query
+        records, rectype, domainname = getrecs(data[12:])
+
+        #DNS Question
+        dnsquestion = buildquestion(domainname, rectype)
+
+        for record in records:
+                dnsbody += rectobytes(domainname, rectype, record['ttl'], record['value'])
+
+        return dnsheader + dnsquestion + dnsbody
 
 while 1:
         data, addr = sock.recvfrom(512)

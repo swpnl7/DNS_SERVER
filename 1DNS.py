@@ -88,7 +88,7 @@ def  getquestiondomain(data):
                         y +=  (expectedlength + 1)
 
         questiontype = data[y:y+2]
-        print (questiontype)
+        #print (questiontype)
         return (domainparts, questiontype)
 
 
@@ -105,10 +105,10 @@ def  getrecs(data):
 
         QT = ''
         if questiontype == b'\x00\x01':
-                QT = 'A'
+                QT = 'a'
 
         zone = getzone(domain)
-        return  (zone, QT, domain)
+        return  (zone[QT], QT, domain)
 
 #Fucntion to build response
 def  buildresponse(data):

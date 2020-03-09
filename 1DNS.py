@@ -130,7 +130,17 @@ def  buildresponse(data):
 
         #Answer Count
         #getquestiondomain(data[12:])
-        print(getrecs(data[12:]))
+        ANCOUNT = len(getrecs(data[12:])[0]).to_bytes(2, byteorder='big')
+        print (ANCOUNT)
+
+        #Name Server Count
+        NSCOUNT = (0).to_bytes(2, byteorder='big')
+
+        #Additional Count
+        ADCOUNT = (0).to_bytes(2, byteorder='big')
+
+        dnsheader =  TransactionID + Flags + QDCOUNT + ANCOUNT + NSCOUNT + ADCOUNT
+        print (dnsheader)
 
 while 1:
         data, addr = sock.recvfrom(512)
